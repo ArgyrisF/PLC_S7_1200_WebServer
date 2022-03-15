@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="UTF-8"/>		<!-- importd -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+	<script src="js/quantumalert.js" charset="utf-8"></script>
+	<script src="dist/gauge.min.js"></script>
+	<script src="js/jquery-3.6.0.min.js"></script>
+	<script src="js/js-snackbar.js"></script>
+	<script src="js/login.js"></script>
+	<link rel="stylesheet" href="css/microtip.css"/>
+	<link rel="stylesheet" href="css/content.min.css"/>
+	<link rel="stylesheet" href="css/js-snackbar.css"/>
+	<title>Read and write to plc</title
+	
+</head>
+
+<body>
+<body onload="onl();">
+<script>
+function onl(){
+	report(9);
+}
+</script>
+
+<!-- HEADER START -->
+		<div id="header" style="font-size:24px;">
+			<table border="0" >
+				<tr>
+					<td width="970px"><img src="img/Logo.png" width="400px" height="100px"/></td>
+					<td id="title" width="550px">Inverter Control 1</td>
+					<td width="400px">PLC1</td>
+				</tr>
+			</table>
+		</div>
+<!-- HEADER END-->
+
+<!-- Content Area -->
+		<div id="content">
+			<div class="containerNavi" style="width:10%">
+				<ul>
+					<a> ---------- ΜΕΝΟΥ ----------</a><br><br>
+					<ul>
+	                    <a href="#" onclick="report(1)">Inverter Control 1</a><br>
+						<br>
+						<a href="#" onclick="report(2)">Inverter Control 2</a><br>
+						<br>
+						<a href="#" onclick="report(3)">Mixer</a><br>
+						<br>
+						<a href="#" onclick="report(4)">Fan</a><br>
+						<br>
+						<br>
+						<a href="#" onclick="report(7)">Aumas 1</a><br>
+						<br>
+						<a href="#" onclick="report(8)">Aumas 2</a><br>
+						<br>
+						<a href="#" onclick="report(9)">Main Page</a><br>
+
+					</ul>
+					
+				</ul>
+			</div>
+		</div>
+
+			<div id="MainSignals" style="position:absolute; top:15%; left:12%; z-index:1">
+
+				<table width="100px" height="10px" border=0>
+				<tr>
+				<b>Signals</b>
+				</tr>
+				</table>
+
+				<table width="500px" height="30px" border=0>
+
+					<a>Emergency Stop:&nbsp;</a>
+						<img id="EmStop" src='img\Status0:="Prepare_Signals_For_Scada".EMERGENCY_STOP:.png' height="20px" width="20px"/> 	
+
+					<a>&emsp;Voltage Regulator:&nbsp;</a>
+						<img id="VReg" src='img\Status0:="Prepare_Signals_For_Scada".EPITIRITIS_TASHS:.png' height="20px" width="20px"/> 
+			
+					<a>&emsp;24V DC:&nbsp;</a>
+						<img id="VDC24" src='img\Status0:="Prepare_Signals_For_Scada".24V_DC:.png' height="20px" width="20px"/> 
+
+					<a>&emsp;Main Trip:&nbsp;</a>
+						<img id="MainsTrip" src='img\Status0:="Prepare_Signals_For_Scada".GENIKOS_DEH:.png' height="20px" width="20px"/> 
+
+					<a>&emsp;Mains Feedback:&nbsp;</a>
+						<img id="FDBCKDeh" src='img\Status0:="Prepare_Signals_For_Scada".FEEDBACK_DEH:.png' height="20px" width="20px"/> 
+
+					<a>&emsp;Generator Trip:&nbsp;</a>
+						<img id="GenTrip" src='img\Status0:="Prepare_Signals_For_Scada".GENIKOS_HZ:.png' height="20px" width="20px"/>
+
+					<a>&emsp;Generator Feedback:&nbsp;</a> 
+						<img id="FDBCKHZ" src='img\Status0:="Prepare_Signals_For_Scada".FEEDBACK_HZ:.png' height="20px" width="20px"/> 
+
+					<a>&emsp;Siren:&nbsp;</a> 
+						<img id="SirenHB" src='img\GreyRed_Status0:="Prepare_Signals_For_Scada".SIREN_HELP_BIT:.png' height="20px" width="20px"/>
+				</table>
+			</div>
+<script>
+	var errar = [];											//Array for storing faults
+	const Alarm_Check = (c_val) => c_val == 1;				//Checks if there is any error
+	$(document).ready(function(){
+		$.ajaxSetup({cache: false});
+		setInterval(function() {							//executes every 2s
+			$.getJSON("jsontags.htm",function(result){
+				errar[0]=result.AS1_Conf_Alarm;  			//Read tags from PLC
+				errar[1]=result.AS1_Therm_Alarm;
+				errar[2]=result.AS1_Inv_Alarm;
+				errar[3]=result.AS2_Conf_Alarm;
+				errar[4]=result.AS2_Therm_Alarm;
+				errar[5]=result.AS2_Inv_Alarm;
+				errar[6]=result.ANAD_Conf_Alarm;
+				errar[7]=result.ANAD_Therm_Alarm;
+				errar[8]=result.FANAPOSM_Conf_Alarm;
+				errar[9]=result.FANAPOSM_Therm_Alarm;
+				errar[10]=result.FANEXH1_Conf_Alarm;
+				errar[11]=result.FANEXH1_Therm_Alarm;
+				errar[12]=result.FANEXH2_Conf_Alarm;
+				errar[13]=result.FANEXH2_Therm_Alarm;
+				errar[14]=result.HLEKDIK1_Conf_Alarm;
+				errar[15]=result.HLEKDIK1_Therm_Alarm;
+				errar[16]=result.HLEKDIK2_Conf_Alarm;
+				errar[17]=result.HLEKDIK2_Therm_Alarm;		//error Array
+				document.getElementById("controlM1").src='img\\Motor\\motor_control'+result.ANAD_Control+'.png';
+				document.getElementById("statusM1").src='img\\Motor\\motor_text_status'+result.ANAD_Status+'.png';
+				document.getElementById("imgM1").src='img\\Motor\\motor_status'+result.ANAD_Status+'.png';
+				document.getElementById("controlM2").src='img\\Motor\\motor_control'+result.FANAPOSM_Control+'.png';
+				document.getElementById("statusM2").src='img\\Motor\\motor_text_status'+result.FANAPOSM_Status+'.png';
+				document.getElementById("imgM2").src='img\\Motor\\motor_status'+result.FANAPOSM_Status+'.png';
+				document.getElementById("controlINV1").src='img\\Inverter\\inverter_control'+result.ANTLSYGK1_Control+'.png';
+				document.getElementById("controlINV2").src='img\\Inverter\\inverter_control'+result.ANTLSYGK2_Control+'.png';
+				document.getElementById("statusINV1").src='img\\Inverter\\inverter_text_status'+result.ANTLSYGK1_Status+'.png';
+				document.getElementById("statusINV2").src='img\\Inverter\\inverter_text_status'+result.ANTLSYGK2_Status+'.png';
+				document.getElementById("imgINV1").src='img\\Inverter\\inverter_status'+result.ANTLSYGK1_Status+'.png';
+				document.getElementById("imgINV2").src='img\\Inverter\\inverter_status'+result.ANTLSYGK2_Status+'.png';
+				document.getElementById("controlAU1").src='img\\Aumas\\aumas_control'+result.AUMAS1_Control+'.png';
+				document.getElementById("controlAU2").src='img\\Aumas\\aumas_control'+result.AUMAS2_Control+'.png';
+				document.getElementById("statusAU1").src='img\\Aumas\\aumas_text_status'+result.AUMAS1_Status+'.png';
+				document.getElementById("statusAU2").src='img\\Aumas\\aumas_text_status'+result.AUMAS2_Status+'.png';
+				document.getElementById("imgAU1").src='img\\Aumas\\aumas_status'+result.AUMAS1_Status+'.png';
+				document.getElementById("imgAU2").src='img\\Aumas\\aumas_status'+result.AUMAS2_Status+'.png';
+				document.getElementById("plantStatusOpAU1").src='img\\GreyGreen_Status0'+result.AUMAS1_Pos_Open+'.png';
+				document.getElementById("plantStatusOpAU2").src='img\\GreyGreen_Status0'+result.AUMAS2_Pos_Open+'.png';
+				document.getElementById("plantStatusClAU1").src='img\\GreyGreen_Status0'+result.AUMAS1_Pos_Closed+'.png';
+				document.getElementById("plantStatusClAU2").src='img\\GreyGreen_Status0'+result.AUMAS2_Pos_Closed+'.png';
+				document.getElementById("EmStop").src='img\\Status0'+result.EmStop+'.png';
+				document.getElementById("VReg").src='img\\Status0'+result.VReg+'.png';
+				document.getElementById("VDC24").src='img\\Status0'+result.VDC24+'.png';
+				document.getElementById("MainsTrip").src='img\\Status0'+result.MainsTrip+'.png';
+				document.getElementById("FDBCKDeh").src='img\\Status0'+result.FDBCKDeh+'.png';
+				document.getElementById("GenTrip").src='img\\Status0'+result.GenTrip+'.png';
+				document.getElementById("FDBCKHZ").src='img\\Status0'+result.FDBCKHZ+'.png';
+				document.getElementById("SirenHB").src='img\\Status0'+result.SirenHB+'.png';
+				document.getElementById("Inverter1WH").innerHTML=result.ANTLSYGK1_WH;
+				document.getElementById("Inverter2WH").innerHTML=result.ANTLSYGK2_WH;
+				document.getElementById("Aumas1WH").innerHTML=result.ANTLSYGK1_WH;
+				document.getElementById("Aumas2WH").innerHTML=result.ANTLSYGK2_WH;
+				document.getElementById("Inverter1FdbckSpeed").innerHTML=result.ANTLSYGK1_FS
+				document.getElementById("Inverter2FdbckSpeed").innerHTML=result.ANTLSYGK2_FS
+				document.getElementById("Motor1_MixerWH").innerHTML=result.ANAD_WH;
+				document.getElementById("Motor2_FanWH").innerHTML=result.FANAPOSM_WH;
+			})
+		if(errar.every(Alarm_Check)){
+			document.getElementById("err").hidden = false;				//if there is an error show alert icon
+			}
+		if( $('.btnErrors').css('background-image').indexOf('errors2')>-1){					//alert icon flashing
+			$('.btnErrors').css('background-image',"url('img/errors.png')");} else {
+			$('.btnErrors').css('background-image',"url('img/errors2.png')");}
+		},2000);																			//duration 2000ms
+	});
+</script>
+
+<div id="spin" class="loader04" hidden></div>												<!-- spin loading effect -->
+<script>
+	async function spinner(){
+		$('#spin').show();
+		$('body>*:not(#spin)*:not(#content)*:not(#header)').css('filter', 'blur(3px)');
+		$('body>*:not(#spin)').css('pointer-events', 'none');
+		await new Promise(r => setTimeout(r, 1200));
+		$('body>*:not(#spin)*:not(#content)*:not(#header)').css('filter', '');
+		$('body>*:not(#spin)').css('pointer-events', 'auto');
+		$('#spin').hide();
+	}
+	function report(period){			<!-- updates parameters based on menu selection. Hides and shows elements -->
+	spinner();
+	if(period==1){
+		[].forEach.call(document.querySelectorAll('.button, .btnErrors, #HDimg, #Inv1Stats'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		[].forEach.call(document.querySelectorAll('#M1img, #M1Stats, #M2img, #konter1, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, .buttonAU, #AU1img, #AU1Stats,#AU2img, #AU2Stats, #MainSignals, #Inv2Stats'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		DB_Name='"Inverter1"';
+		document.getElementById("title").innerHTML="Inverter Control 1";
+		document.getElementById("HD2img").style.visibility = 'hidden';
+		document.getElementById("HD1img").style.visibility = 'visible';
+		document.getElementById("btnOp").style.visibility = 'hidden';
+		document.getElementById("btnCl").style.visibility = 'hidden';
+		}
+	else if(period==2){
+		[].forEach.call(document.querySelectorAll('.button, .btnErrors, #HDimg, #Inv2Stats'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		[].forEach.call(document.querySelectorAll('#konter1, #M1img, #M1Stats, #M2img, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, .buttonAU, #AU1img, #AU1Stats,#AU2img, #AU2Stats, #MainSignals, #Inv1Stats'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		DB_Name='"Inverter2"';
+		document.getElementById("title").innerHTML="Inverter Control 2";
+		document.getElementById("HD1img").style.visibility = 'hidden';
+		document.getElementById("HD2img").style.visibility = 'visible';
+		document.getElementById("btnOp").style.visibility = 'hidden';
+		document.getElementById("btnCl").style.visibility = 'hidden';
+		}
+	else if (period==3){
+		[].forEach.call(document.querySelectorAll('#M2img, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, #konter1, .buttonAU, #Inv1Stats, #Inv2Stats, #HD1img, #HD2img, .button, .btnErrors, #konter1, #AU1img, #AU1Stats, #AU2img, #AU2Stats, #konter1, #MainSignals'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		[].forEach.call(document.querySelectorAll('.button, #M1img, #M1Stats, .btnErrors'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		DB_Name='"Motor1_Mixer"';
+		document.getElementById("title").innerHTML="Mixer";
+		}
+	else if (period==4){
+		[].forEach.call(document.querySelectorAll('#M1img, #M1Stats, #M3img, #M3Stats, #M4img, #M4Stats, #konter1, .tank2, .buttonAU, #Inv1Stats, #Inv2Stats, #HD1img, #HD2img, .button, .btnErrors, #konter1, #AU1img, #AU1Stats, #AU2img, #AU2Stats, #konter1, #MainSignals'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		[].forEach.call(document.querySelectorAll('.button, #M2img, #M2Stats, .btnErrors'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		DB_Name='"Motor2_Fan"';
+		document.getElementById("title").innerHTML="Fan";
+		}
+	else if (period==7){
+		[].forEach.call(document.querySelectorAll('.button, .buttonAU, .btnErrors, #AU1img, #AU1Stats'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		[].forEach.call(document.querySelectorAll('#AU2img, #AU2Stats, #konter1, #M1img, #M1Stats, #M2img, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, #Inv1Stats, #Inv2Stats, #HD1img, #HD2img, #MainSignals'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		DB_Name='"Aumas1"';
+		document.getElementById("title").innerHTML="Aumas 1";
+		document.getElementById("btnStart").style.visibility = 'hidden';
+		document.getElementById("btnStop").style.visibility = 'hidden';
+		}
+	else if (period==8){
+		[].forEach.call(document.querySelectorAll('.button, .buttonAU, .btnErrors, #AU2img, #AU2Stats'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		[].forEach.call(document.querySelectorAll('#M1img, #konter1, #M1Stats, #M2img, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, #Inv1Stats, #Inv2Stats, #HD1img, #HD2img, #AU1img, #AU1Stats, #MainSignals'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		DB_Name='"Aumas2"';
+		document.getElementById("title").innerHTML="Aumas 2";
+		document.getElementById("btnStart").style.visibility = 'hidden';
+		document.getElementById("btnStop").style.visibility = 'hidden';
+		}
+	else if (period==9){
+		[].forEach.call(document.querySelectorAll('#MainSignals'), function (el) {
+			el.style.visibility = 'visible';
+		});
+		[].forEach.call(document.querySelectorAll('#M1img, #M1Stats, #M2img, #M2Stats, #M3img, #M3Stats, #M4img, #M4Stats, .tank2, #Inv1Stats, #Inv2Stats, #HD1img, #HD2img, .button, .buttonAU, .btnErrors, #konter1, #AU1img, #AU1Stats, #AU2img, #AU2Stats, #konter1'), function (el) {
+			el.style.visibility = 'hidden';
+		});
+		document.getElementById("LogoutBtn").style.visibility = 'visible';
+		document.getElementById("sireen").style.visibility = 'visible';
+		document.getElementById("title").innerHTML="Main Page";
+		}
+	else
+		return;
+	}
+</script>
+<p <a class="button" id="LogoutBtn" style="position:absolute; bottom:23%; left:15px; width: 50px; height: 18px;" href="/FormLogin?LOGOUT">LogOut</a></p>
+<div id="btnStart" class="button" onclick="startfunc()"  style="position:absolute; bottom:35%; left:10.5%; width: 50px; height: 18px;">
+	<a>Start</a>
+</div>
+<script>
+function startfunc(){						//start function sends command to plc. Same button is used for every motor / inverter.
+	url="out.htm";
+	name=DB_Name+'.C_Start_Frw';
+	val=1;
+	sdata=escape(name)+'='+val;
+	$.post(url,sdata,function(result){});
+}
+</script>
+
+<div id="btnStop" class="button" onclick="stopfunc()" style="position:absolute; bottom:35%; left:16.2%; width: 50px; height: 18px;">
+	<a>Stop</a>
+</div>
+<script>
+function stopfunc(){
+		url="out.htm";
+		name=DB_Name+'.C_Start_Frw';
+		val=0;
+		sdata=escape(name)+'='+val;
+		$.post(url,sdata,function(result){});
+	}
+</script>
+
+<div id="btnOp" class="buttonAU" onclick="openfunc()" style="position:absolute; bottom:35%; left:10.5%; width: 50px; height: 18px;">
+	<a>Open</a>
+</div>
+<script>
+function openfunc(){
+	url="out.htm";
+	name=DB_Name+'.C_Start_rev';
+	val=0;
+	sdata=escape(name)+'='+val;
+	$.post(url,sdata,function(result){});
+	name=DB_Name+'.C_Start_Frw';
+	val=1;
+	sdata=escape(name)+'='+val;
+	$.post(url,sdata,function(result){});
+}
+</script>
+
+<div id="btnCl" class="buttonAU" onclick="closefunc()" style="position:absolute; bottom:35%; left:16.2%; width: 50px; height: 18px;">
+	<a>Close</a>
+</div>
+<script>
+function closefunc(){
+	url="out.htm";
+	name=DB_Name+'.C_Start_Frw';
+	val=0;
+	sdata=escape(name)+'='+val;
+	$.post(url,sdata,function(result){});
+	name=DB_Name+'.C_Start_rev';
+	val=1;
+	sdata=escape(name)+'='+val;
+	$.post(url,sdata,function(result){});
+	}
+</script>
+
+<div class="button" onclick="autofunc()" style="position:absolute; bottom:30.5%; left:16.2%; width: 50px; height: 18px;">
+	<a>Auto</a>
+</div>
+<script>
+function autofunc(){
+		url="out.htm";
+		name=DB_Name+'.C_Manual';
+		val=0;
+		sdata=escape(name)+'='+val;
+		$.post(url,sdata,function(result){});
+	}
+</script>
+<div class="button" onclick="manfunc()" style="position:absolute; bottom:30.5%; left:10.5%; width: 50px; height: 18px;">
+	<a>Manual</a>
+</div>
+<script>
+function manfunc(){
+		url="out.htm";
+		name=DB_Name+'.C_Manual';
+		val=1;
+		sdata=escape(name)+'='+val;
+		$.post(url,sdata,function(result){});
+	}
+</script>
+<div class="button" onclick="ackfunc()" style="position:absolute; bottom:24.5%; left:10.5%; width: 158px; height: 30px;">
+	<a>Acknowledge Errors</a>
+</div>
+<script>
+function ackfunc(){
+		document.getElementById("err").hidden = true;
+		url="out.htm";
+		name=DB_Name+'.C_Ack';
+		val=1;
+		sdata=escape(name)+'='+val;
+		$.post(url,sdata,function(result){});
+	}
+</script>
+<div id="btnSetTime" class="button" onclick="setTfunc()" style="position:absolute; bottom:39.5%; left:10.5%; width: 50px; height: 32px;">
+	<a>Set Time</a>
+</div>
+<script>
+function setTfunc(){
+		url="out.htm";
+		name=DB_Name+'.Fed_Timer.Set_Time_Sec';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetFdbckT").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+		name=DB_Name+'.Safe_Start_Timer.Set_Time_Sec';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetSafeStartT").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+		name=DB_Name+'.Safe_Stop_Timer.Set_Time_Sec';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetSafeStopT").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+	}
+</script>
+<div id="btnSetHz" class="button" onclick="setHzfunc()" style="position:absolute; bottom:39.5%; left:16.2%; width: 50px; height: 32px;">
+	<a>Set Hz</a>
+</div>
+<script>
+function setHzfunc(){
+		url="out.htm";
+		name=DB_Name+'.Manual_Speed';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetManSpeed").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+		name=DB_Name+'.Min_Speed';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetMinSpeed").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+		name=DB_Name+'.Max_Speed';
+		val=document.getElementById(DB_Name.replace(/"/g, '')+"SetMaxSpeed").value;
+		if(val!=null){
+			sdata=escape(name)+'='+val;
+			$.post(url,sdata,function(result){});}
+	}
+</script>
+
+<div class="button" id="sireen" onclick="sirenfunc()" style="position:absolute; bottom:79%; left:85%; width: 60px; height: 22px;">
+	<a>Siren</a>
+</div>
+<script>
+function sirenfunc(){
+		document.getElementById("err").hidden = true;
+		url="out.htm";
+		name='"Prepare_Signals_For_Scada".SIREN_OUTPUT';
+		val=1;
+		sdata=escape(name)+'='+val;
+		$.post(url,sdata,function(result){});
+	}
+</script>
+
+<div id="err" hidden>
+	<a class="btnErrors" onclick="errfunc()"></a>
+</div>
+<script>								//displays error message based on array entries
+function errfunc(){
+    var l = errar.length;
+	var i = 0;
+	function geti(){
+		return i;
+		}
+	for (i; i <= l; i++){
+		if(errar[i] == 1){
+			switch (geti()) {
+				case 0:
+					SnackBar({
+						message: "Feedback Error Inverter 1!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 1:
+					SnackBar({
+						message: "Thermal Error Inverter 1!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 2:
+					SnackBar({
+						message: "General Error Inverter 1!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+				case 3:
+					SnackBar({
+						message: "Feedback Error Inverter 2!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 4:
+					SnackBar({
+						message: "Thermal Error Inverter 2!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 5:
+					SnackBar({
+						message: "General Error Inverter 2!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 6:
+					SnackBar({
+						message: "Feedback Error Mixer!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 7:
+					SnackBar({
+						message: "Thermal Error Mixer!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 8:
+					SnackBar({
+						message: "Feedback Error Fan!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 9:
+					SnackBar({
+						message: "Thermal Error Fan!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 10:
+					SnackBar({
+						message: "Feedback Error Aumas 1!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 11:
+					SnackBar({
+						message: "Thermal Error Aumas 1!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 12:
+					SnackBar({
+						message: "Feedback Error Aumas 2!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;
+				case 13:
+					SnackBar({
+						message: "Thermal Error Aumas 2!",
+						dismissible: true,
+						status: "error",
+						position: "tm",
+					});
+					break;}
+		}
+	} 
+}
+</script>
+
+<div id="konter1">
+	<form id='form1'>
+		<div id='d1' style="position:absolute; bottom:28%; left:20%; z-index:1">
+			<canvas id="gauge1"></canvas>
+		</div>
+		<div id="gauge1txt" style="position:absolute; bottom:26%; left:26%; z-index:2; font-weight:bold"></div>
+	</form>
+</div>
+<script>
+var opts1 = {										//gauge, not used
+  angle: 0.1, // The span of the gauge arc
+  lineWidth: 0.18, // The line thickness
+  radiusScale: 0.5, // Relative radius
+  pointer: {
+    length: 0.6, // // Relative to gauge radius
+    strokeWidth: 0.038, // The thickness
+    color: '#000000' // Fill color
+  },
+  limitMax: false,     // If false, max value increases automatically if value > maxValue
+  limitMin: false,     // If true, the min value of the gauge will be fixed
+  colorStart: '#FF0000',   // Colors
+  colorStop: '#DA0909',    // just experiment with them
+  strokeColor: '#F2E2E2',  // to see which ones work best for you
+  generateGradient: true,
+  highDpiSupport: true,     // High resolution support
+  staticLabels: {
+      font: "14px sans-serif",
+      labels: [0, 500, 1000],
+      fractionDigits: 0
+    },
+};
+var target1 = document.getElementById('gauge1'); // your canvas element
+var gauge1 = new Gauge(target1).setOptions(opts1); // create sexy gauge!
+gauge1.maxValue = 1000; // set max gauge value
+gauge1.setMinValue(0);  // Prefer setter over gauge.minValue = 0
+gauge1.animationSpeed = 32; // set animation speed (32 is default value)
+gauge1.set(0); // set actual value
+document.getElementById("gauge1txt").className = "gaugetxt";
+gauge1.setTextField(document.getElementById("gauge1txt"));
+</script>
+</div>
+
+<style>
+.wrap2{
+	font-family: Roboto;
+	text-align: left;
+}
+.tank2{
+	margin:0 50px;
+	display: inline-block;
+	position:absolute;
+	bottom:5%;
+	left:200px;
+}
+body2{
+	/*background: #eee;*/
+	margin: 0;
+}
+</style>
+<div id="tankdiv2" class="wrap2">
+	<div class="tank2 waterTankHere2"></div>
+</div>
+<script src="js/waterTank.min.js"></script>
+<script>
+$(document).ready(function() {						//water tank not used
+	$('.waterTankHere2').waterTank({
+		width: 130,
+		height: 100,
+		color: '#2e32ff',
+		level: 0
+	}).on('click', function(event) {
+		$(this).waterTank(Math.floor(Math.random() * 50) + 0 );
+	});
+});
+</script>
+
+<!-- CONTROL - STATUS MOTOR1 START  Updates images to show if motor is working and its current state -->
+<div id="M1img" style="position:absolute; top:10%; left:8%; z-index:1">
+	<table width="900px" height="150px" border=0>
+		<tr>
+			<td width="210px" align="center" height="100px">
+				<img id="imgM1" src='img\Motor\motor_status:="Motor1_Mixer".Moter_status:.png' alt="Pump" width="150px" height="80px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>Control:</h4> <img id="controlM1" src='img\Motor\motor_control:="Motor1_Mixer".Moter_Control:.png' id="Moter_control" alt="Pump" width="250px" height="30px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>State:</h4> <img id="statusM1" src='img\Motor\motor_text_status:="Motor1_Mixer".Moter_status:.png' id="Moter_status" alt="Pump" width="250px" height="30px">
+			</td>
+		</tr>
+	</table>
+</div>
+	
+<div id="M1Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor1_MixerSetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Motor1_MixerWH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor1_MixerSetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor1_MixerSetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  </table>
+</div>
+<!-- CONTROL - STATUS MOTOR1 END-->
+
+<!-- CONTROL - STATUS MOTOR2 START -->
+<div id="M2img" style="position:absolute; top:10%; left:8%; z-index:1">
+	<table width="900px" height="150px" border=0>
+		<tr>
+			<td width="210px" align="center" height="100px">
+				<img id="imgM2" src='img\Motor\motor_status:="Motor2_Fan".Moter_status:.png' alt="Pump" width="150px" height="80px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>Control:</h4> <img id="controlM2" src='img\Motor\motor_control:="Motor2_Fan".Moter_Control:.png' id="Moter_control" alt="Pump" width="250px" height="30px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>Status:</h4> <img id="statusM2" src='img\Motor\motor_text_status:="Motor2_Fan".Moter_status:.png' id="Moter_status" alt="Pump" width="250px" height="30px">
+			</td>
+		</tr>
+	</table>
+</div>
+	
+<div id="M2Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor2_FanSetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Motor2_FanWH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor2_FanSetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Motor2_FanSetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+ </table>
+</div>
+<!-- CONTROL - STATUS MOTOR2 END-->
+
+<!-- CONTROL - STATUS INVERTER START -->
+<div id="HDimg">
+	<div id="HD1img" style="position:absolute; top:10%; left:8%; z-index:1">
+		<table width="900px" height="150px" border=0>
+			<tr>
+				<td width="210px" align="center" height="100px">
+					<img id="imgHD1" src='img\Inverter\inverter_status:="Inverter1".Moter_status:.png' id="Moter_status" alt="Pump" width="150px" height="80px">
+				</td>
+				<td width="270px" align="center" height="30px">
+					<h4>Control:</h4> <img id="controlINV1" src='img\Inverter\inverter_control:="Inverter1".Moter_Control:.png' id="Moter_control" alt="Pump" width="250px" height="30px">
+				</td>
+				<td width="270px" align="center" height="30px">
+					<h4>Status:</h4> <img id="statusINV1" src='img\Inverter\inverter_text_status:="Inverter1".Moter_status:.png' id="Moter_status" alt="Pump" width="250px" height="30px">
+				</td>
+
+			</tr>
+		</table>
+	</div>
+
+	<div id="HD2img" style="position:absolute; top:10%; left:8%; z-index:1">
+		<table width="900px" height="150px" border=0>
+				<tr>
+				<td width="210px" align="center" height="100px">
+					<img id="imgHD2" src='img\Inverter\inverter_status:="Inverter2".Moter_status:.png' id="Moter_status" alt="Pump" width="150px" height="80px">
+				</td>
+				<td width="270px" align="center" height="30px">
+					<h4>Control:</h4> <img id="controlINV2" src='img\Inverter\inverter_control:="Inverter2".Moter_Control:.png' id="Moter_control" alt="Pump" width="250px" height="30px">
+				</td>
+				<td width="270px" align="center" height="30px">
+					<h4>Status:</h4> <img id="statusINV2" src='img\Inverter\inverter_text_status:="Inverter2".Moter_status:.png' id="Moter_status" alt="Pump" width="250px" height="30px">
+				</td>
+				</tr>
+		</table>
+	</div>
+<!-- CONTROL - STATUS INVERTER END-->
+<div id="Inv1Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter1SetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Inverter1WH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter1SetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Frequency: <label style="padding-left:30px" id="Inverter1Freq"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hz </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter1SetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Ampere: <label style="padding-left:50px" id="Inverter1Amps"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Amp </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback speed: </font> 
+	</td>
+    <td style="padding-left:5px">
+		<label id="Inverter1FdbckSpeed"></label>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Manual speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter1SetManSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Min speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter1SetMinSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Max speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter1SetMaxSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+</table>
+<!-- INVERTER SPEED SETTINGS END-->
+</div>
+
+<div id="Inv2Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter2SetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Inverter2WH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter2SetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Frequency: <label style="padding-left:30px" id="Inverter2Freq"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hz </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Inverter2SetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Ampere: <label style="padding-left:50px" id="Inverter2Amps"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Amp </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback speed: </font> 
+	</td>
+    <td style="padding-left:5px">
+		<label id="Inverter2FdbckSpeed"></label>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Manual speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter2SetManSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Min speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter2SetMinSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Max speed: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font size="2" id="Inverter2SetMaxSpeed">
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">Hz</font></td>
+  </tr>
+</table>
+<!-- INVERTER SPEED SETTINGS END-->
+</div>
+
+<div id="AU1img">
+	<div style="position:absolute; top:10%; left:12%; z-index:1">
+		<table width="1300px" height="150px" border=0>
+			<tr>
+			<td width="210px" align="center" height="100px">
+				<img id="imgAU1" src='img\Aumas\aumas_status:="Aumas1".A_status:.png' id="Aumas_status" alt="Aumas" width="150px" height="80px">
+			</td>
+            <td width="270px" align="center" height="30px">
+				<h4>Control</h4> <img id="controlAU1" src='img\Aumas\aumas_control:="Aumas1".A_Control:.png' id="Aumas_control" alt="Aumas" width="250px" height="30px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>Status</h4> <img id="statusAU1" src='img\Aumas\aumas_text_status:="Aumas1".A_status:.png' id="Aumas_status" alt="Aumas" width="250px" height="30px">
+			</td>
+			<td width="150px" align="center" height="30px">
+				<h4>Open Position</h4> <img id="plantStatusOpAU1" src='img\GreyGreen_Status0:="Aumas1".Pos_Open:.png' height="40px" width="40px"/>
+			</td>
+            <td width="150px" align="center" height="30px">
+				<h4>Closed Position</h4> <img id="plantStatusClAU1" src='img\GreyGreen_Status0:="Aumas1".Pos_Closed:.png' height="40px" width="40px"/>
+			</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div id="AU2img">
+	<div style="position:absolute; top:10%; left:12%; z-index:1">
+		<table width="1300px" height="150px" border=0>
+			<tr>
+			<td width="210px" align="center" height="100px">
+				<img id="imgAU2" src='img\Aumas\aumas_status:="Aumas2".A_status:.png' id="Aumas_status" alt="Aumas" width="150px" height="80px">
+			</td>
+            <td width="270px" align="center" height="30px">
+				<h4>Control</h4> <img id="controlAU2" src='img\Aumas\aumas_control:="Aumas2".A_Control:.png' id="Aumas_control" alt="Aumas" width="250px" height="30px">
+			</td>
+			<td width="270px" align="center" height="30px">
+				<h4>Status</h4> <img id="statusAU2" src='img\Aumas\aumas_text_status:="Aumas2".A_status:.png' id="Aumas_status" alt="Aumas" width="250px" height="30px">
+			</td>
+			<td width="150px" align="center" height="30px">
+				<h4>Open Position</h4> <img id="plantStatusOpAU2" src='img\GreyGreen_Status0:="Aumas2".Pos_Open:.png' height="40px" width="40px"/>
+			</td>
+            <td width="150px" align="center" height="30px">
+				<h4>Closed Position</h4> <img id="plantStatusClAU2" src='img\GreyGreen_Status0:="Aumas2".Pos_Closed:.png' height="40px" width="40px"/>
+			</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<!-- CONTROL - STATUS AUMAS END-->
+
+<!-- AUMAS DATA START-->
+<div id="AU1Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas1SetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Aumas1WH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas1SetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas1SetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  </table>
+</div>
+
+<div id="AU2Stats">
+<table style="position:absolute; top:26%; left:12%; z-index:1;">
+  <tr>
+	<td>
+		<font size="4" color="black">Feedback time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas2SetFdbckT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+    <td style="padding:10px"><font size="4" color="black">Working Hour: <label style="padding:5px" id="Aumas2WH"></label></font></td>
+    <td style="padding:5px"><font size="4" color="black">Hours </font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe start time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas2SetSafeStartT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  <tr>
+	<td>
+		<font size="4" color="black">Safe stop time: </font> 
+	</td>
+    <td>
+		<form method="post">
+			<input type="number2" font="" size="2" id="Aumas2SetSafeStopT">						
+		</form>
+	</td>
+	<td style="padding:5px"><font size="4" color="black">sec</font></td>
+  </tr>
+  </table>
+</div>
+</body>
+</html>
